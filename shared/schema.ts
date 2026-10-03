@@ -20,6 +20,7 @@ export type AdminUser = typeof adminUsers.$inferSelect;
 // ============ PRODUTOS ============
 export const produtos = sqliteTable("produtos", {
   id: integer("id").primaryKey({ autoIncrement: true }),
+  stockCode: integer("stock_code").notNull().unique().default(0),
   nome: text("nome").notNull(),
   descricao: text("descricao").notNull().default(""),
   preco: real("preco").notNull(),
