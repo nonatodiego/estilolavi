@@ -29,6 +29,9 @@ export function ProductCard({ produto }: { produto: ProdutoView }) {
             >
               {produto.nome}
             </h3>
+            <div className="mt-1 text-[11px] text-muted-foreground" data-testid={`text-product-stock-code-${produto.id}`}>
+              Cód. do produto: #{produto.stockCode}
+            </div>
             <div className="mt-2 flex items-baseline gap-2">
               <span
                 className="text-base font-semibold text-foreground"

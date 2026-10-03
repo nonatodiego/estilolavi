@@ -238,6 +238,10 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
       res.json(p);
     } catch (err: any) {
       if (err instanceof z.ZodError) return res.status(400).json({ error: "Dados inválidos", details: err.errors });
+      if (String(err?.message || "").includes("UNIQUE constraint failed") && String(err?.message || "").includes("stock_code")) {
+        const code = req.body?.stockCode;
+        return res.status(409).json({ error: `Já existe um produto com o ID #${code}` });
+      }
       res.status(500).json({ error: "Erro ao criar produto" });
     }
   });

@@ -14,6 +14,7 @@ import { Plus, Pencil, Trash2, X, Star } from "lucide-react";
 
 interface ProdutoForm {
   id?: number;
+  stockCode?: number;
   nome: string;
   descricao: string;
   preco: string;
@@ -51,6 +52,7 @@ export default function AdminProdutos() {
   function abrirEdicao(p: ProdutoView) {
     setEditing({
       id: p.id,
+      stockCode: p.stockCode,
       nome: p.nome,
       descricao: p.descricao,
       preco: String(p.preco),
@@ -67,6 +69,7 @@ export default function AdminProdutos() {
     mutationFn: async () => {
       if (!editing) return;
       const body = {
+        ...(editing.id ? {} : { stockCode: editing.stockCode }),
         nome: editing.nome,
         descricao: editing.descricao,
         preco: Number(editing.preco) || 0,
@@ -130,6 +133,7 @@ export default function AdminProdutos() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="font-medium">{p.nome}</div>
+                    <div className="text-xs text-muted-foreground">ID de estoque: #{p.stockCode}</div>
                     <div className="text-sm text-muted-foreground">{formatBRL(p.preco)}</div>
                   </div>
                   <div className="flex gap-1">
@@ -184,6 +188,24 @@ export default function AdminProdutos() {
               }}
               className="mt-4 space-y-3"
             >
+              {editing.id ? (
+                <div>
+                  <Label>ID de estoque</Label>
+                  <Input value={String(editing.stockCode ?? "")} readOnly className="bg-muted" data-testid="input-prod-stock-code" />
+                </div>
+              ) : (
+                <div>
+                  <Label>ID de estoque (opcional)</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={editing.stockCode ?? ""}
+                    onChange={(e) => setEditing({ ...editing, stockCode: e.target.value ? Number(e.target.value) : undefined })}
+                    placeholder="Gerado automaticamente se vazio"
+                    data-testid="input-prod-stock-code"
+                  />
+                </div>
+              )}
               <div>
                 <Label>Nome *</Label>
                 <Input value={editing.nome} onChange={(e) => setEditing({ ...editing, nome: e.target.value })} required data-testid="input-prod-nome" />

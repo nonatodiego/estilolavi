@@ -102,6 +102,9 @@ export default function ProdutoDetalhe() {
               <div className="mt-2 text-2xl font-semibold text-foreground" data-testid="text-product-price">
                 {formatBRL(produto.preco)}
               </div>
+              <div className="mt-1 text-xs text-muted-foreground" data-testid="text-product-stock-code">
+                Cód. do produto: #{produto.stockCode}
+              </div>
               <p className="mt-1 text-xs text-muted-foreground">
                 Em até 3x sem juros · 5% off no Pix
               </p>

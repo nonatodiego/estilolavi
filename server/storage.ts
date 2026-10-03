@@ -35,7 +35,8 @@ sqlite.exec(`
     destaque INTEGER NOT NULL DEFAULT 0,
     ativo INTEGER NOT NULL DEFAULT 1,
     estoque INTEGER NOT NULL DEFAULT 99,
-    criado_em INTEGER NOT NULL DEFAULT 0
+    criado_em INTEGER NOT NULL DEFAULT 0,
+    stock_code INTEGER NOT NULL DEFAULT 0
   );
   CREATE TABLE IF NOT EXISTS pedidos (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,6 +54,15 @@ sqlite.exec(`
     data_pagamento INTEGER
   );
 `);
+
+// Migração compatível com bancos existentes: adiciona o código de estoque,
+// preenche produtos antigos e garante unicidade no banco.
+const produtoColumns = sqlite.prepare("PRAGMA table_info(produtos)").all() as Array<{ name: string }>;
+if (!produtoColumns.some((column) => column.name === "stock_code")) {
+  sqlite.exec("ALTER TABLE produtos ADD COLUMN stock_code INTEGER NOT NULL DEFAULT 0");
+}
+sqlite.exec("UPDATE produtos SET stock_code = id WHERE stock_code = 0");
+sqlite.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_produtos_stock_code ON produtos(stock_code)");
 
 export const db = drizzle(sqlite);
 
@@ -114,9 +124,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProduto(data: InsertProduto): Promise<Produto> {
+    const stockCode =
+      data.stockCode && data.stockCode > 0
+        ? data.stockCode
+        : ((db.select({ max: produtos.stockCode }).from(produtos).get()?.max || 0) + 1);
+
     return db
       .insert(produtos)
-      .values({ ...data, criadoEm: Date.now() })
+      .values({ ...data, stockCode, criadoEm: Date.now() })
       .returning()
       .get();
   }
