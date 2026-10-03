@@ -133,6 +133,7 @@ export default function AdminProdutos() {
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <div className="font-medium">{p.nome}</div>
+                    <div className="text-xs text-muted-foreground">ID de estoque: #{p.stockCode}</div>
                     <div className="text-sm text-muted-foreground">{formatBRL(p.preco)}</div>
                   </div>
                   <div className="flex gap-1">
